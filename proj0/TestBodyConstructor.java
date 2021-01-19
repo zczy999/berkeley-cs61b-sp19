@@ -9,7 +9,7 @@ public class TestBodyConstructor {
     public static void main(String[] args) {
         checkBodyConstructor();
     }
-
+    
     /**
      *  Checks whether or not two boubles are equal and prints the result.
      *

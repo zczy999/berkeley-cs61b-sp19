@@ -146,7 +146,6 @@ public final class In {
             if (url == null) { url = new URL(s); }
 
             URLConnection site = url.openConnection();
-
             // in order to set User-Agent, replace above line with these two
             // HttpURLConnection site = (HttpURLConnection) url.openConnection();
             // site.addRequestProperty("User-Agent", "Mozilla/4.76");

@@ -10,6 +10,9 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 
+import static huglife.HugLifeUtils.randomEntry;
+import static huglife.HugLifeUtils.random;
+
 /**
  * An implementation of a motile pacifist photosynthesizer.
  *
@@ -35,9 +38,9 @@ public class Plip extends Creature {
      */
     public Plip(double e) {
         super("plip");
-        r = 0;
-        g = 0;
-        b = 0;
+        r = 99;
+        b = 76;
+        g = 63 + (int)(96*energy);
         energy = e;
     }
 
@@ -57,7 +60,7 @@ public class Plip extends Creature {
      * that you get this exactly correct.
      */
     public Color color() {
-        g = 63;
+        g = 63 + (int)(96*energy);
         return color(r, g, b);
     }
 
@@ -74,7 +77,10 @@ public class Plip extends Creature {
      * private static final variable. This is not required for this lab.
      */
     public void move() {
-        // TODO
+        this.energy -= 0.15;
+        if (energy<0){
+            energy = 0;
+        }
     }
 
 
@@ -82,7 +88,10 @@ public class Plip extends Creature {
      * Plips gain 0.2 energy when staying due to photosynthesis.
      */
     public void stay() {
-        // TODO
+        this.energy += 0.2;
+        if (energy>2) {
+            energy = 2;
+        }
     }
 
     /**
@@ -91,7 +100,8 @@ public class Plip extends Creature {
      * Plip.
      */
     public Plip replicate() {
-        return this;
+        this.energy = this.energy/2;
+        return new Plip(energy);
     }
 
     /**
@@ -111,19 +121,35 @@ public class Plip extends Creature {
         // Rule 1
         Deque<Direction> emptyNeighbors = new ArrayDeque<>();
         boolean anyClorus = false;
-        // TODO
+        for (Direction d: Direction.values()) {
+            Occupant o = neighbors.get(d);
+            if (o!=null && "empty".equals(o.name())){
+                emptyNeighbors.add(d);
+            }else {
+                if ("clorus".equals(o.name())) {
+                    anyClorus = true;
+                }
+            }
+        }
         // (Google: Enhanced for-loop over keys of NEIGHBORS?)
         // for () {...}
 
-        if (false) { // FIXME
-            // TODO
+        if (emptyNeighbors.isEmpty()) {
+            return new Action(Action.ActionType.STAY);
         }
 
         // Rule 2
         // HINT: randomEntry(emptyNeighbors)
-
-        // Rule 3
-
+        if (energy >= 1){
+            Direction direction = randomEntry(emptyNeighbors);
+            return new Action(Action.ActionType.REPLICATE,direction);
+        } else if (anyClorus) {
+            double i = random();
+            if (i == 1) {
+                Direction direction = randomEntry(emptyNeighbors);
+                return new Action(Action.ActionType.REPLICATE,direction);
+            }
+        }
         // Rule 4
         return new Action(Action.ActionType.STAY);
     }

@@ -115,7 +115,49 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
 
     @Override
     public V remove(K key) {
-        return null;
+        if (key == null) {
+            throw new IllegalArgumentException("calls remove() with a null key");
+        }
+        V deleteIterm = get(key);
+        root = remove(key, root);
+        return deleteIterm;
+    }
+
+    private Node remove(K key, Node x) {
+        if (x == null) {
+            return null;
+        }
+        int comp = key.compareTo(x.key);
+        if (comp < 0) {
+            x.left = remove(key, x.left);
+        } else if (comp > 0) {
+            x.right = remove(key, x.right);
+        } else {
+            if (x.left == null) return x.right;
+            if (x.right  == null) return x.left;
+            Node t = x;
+            x = maxNode(t.left);
+            x.left = deleteMax(t.left);
+            x.right = t.right;
+        }
+        x.size = size(x.left) + size(x.right) + 1;
+        return x;
+    }
+
+    private Node deleteMax(Node x) {
+        if (x.right == null) {
+            return x.left;
+        }
+        x.right = deleteMax(x.right);
+        x.size = x.left.size + x.right.size + 1;
+        return x;
+    }
+
+    private Node maxNode(Node x) {
+        if (x.right == null) {
+            return x;
+        }
+        return maxNode(x.right);
     }
 
     @Override
@@ -126,5 +168,9 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
     @Override
     public Iterator<K> iterator() {
         return null;
+    }
+
+    public void printInOrder() {
+
     }
 }

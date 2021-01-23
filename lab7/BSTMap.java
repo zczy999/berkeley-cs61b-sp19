@@ -1,3 +1,4 @@
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -110,7 +111,11 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
 
     @Override
     public Set<K> keySet() {
-        return null;
+        Set<K> kSet = new HashSet<>(size());
+        for (K k: this) {
+            kSet.add(k);
+        }
+        return kSet;
     }
 
     @Override
@@ -162,15 +167,62 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
 
     @Override
     public V remove(K key, V value) {
-        return null;
+        V deleteIterm = get(key);
+        if (value.equals(deleteIterm)) {
+            remove(key);
+        }
+        return value;
     }
 
     @Override
     public Iterator<K> iterator() {
-        return null;
+        return new BSTMapIterator();
+    }
+
+    private class BSTMapIterator implements Iterator<K> {
+        int cur;
+        int rootsize;
+
+        public BSTMapIterator() {
+            cur = 0;
+            rootsize = root.size;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cur < size();
+        }
+
+        @Override
+        public K next() {
+            Node tem = findNodeInOrder(root, cur);
+            cur += 1;
+            return tem.key;
+        }
+    }
+
+    private Node findNodeInOrder(Node x, int k) {
+        if (x == null) return null;
+        if ( k>x.size) return null;
+        int n = size(x.left);
+        Node findNode;
+        if (k < n) {
+            findNode = findNodeInOrder(x.left, k);
+        } else if (k > n) {
+            // 右子树规模是 k - leftNodes - 1
+            //     T
+            //   a    c    --------       c
+            // b  e  f  d               f   d
+            findNode = findNodeInOrder(x.right,k-n-1);
+        } else {
+            return x;
+        }
+        return findNode;
     }
 
     public void printInOrder() {
-
+        for (K k: this) {
+            System.out.println(k);
+        }
     }
 }

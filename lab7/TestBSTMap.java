@@ -92,7 +92,11 @@ public class TestBSTMap {
         q.put("b","a");
         q.put("a","a");
         q.put("d","a");
-        q.put("e","a");                         // a b c d e
+        q.put("e","a");
+        q.printInOrder();// a b c d e
+        for (String a: q) {
+            System.out.println(a);
+        }
         assertTrue(null != q.remove("e"));      // a b c d
         assertTrue(q.containsKey("a"));
         assertTrue(q.containsKey("b"));
@@ -107,6 +111,18 @@ public class TestBSTMap {
         assertTrue(q.containsKey("a"));
         assertTrue(q.containsKey("b"));
         assertTrue(q.containsKey("f"));
+    }
+
+    @Test
+    public void testIterator() {
+        BSTMap<String,String> q = new BSTMap<String,String>();
+        q.put("b","a");
+        q.put("c","a");
+        q.put("a","a");
+        for (String a:q) {
+            System.out.println(a);
+        }
+        System.out.println(q.keySet());
     }
 
 /*

@@ -12,24 +12,43 @@ public class SimpleOomage implements Oomage {
     private static final double WIDTH = 0.01;
     private static final boolean USE_PERFECT_HASH = false;
 
+
     @Override
     public boolean equals(Object o) {
         // TODO: Write this method.
-        return false;
+        if (o == this) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        SimpleOomage s = (SimpleOomage) o;
+        if (red!=s.red) return false;
+        if (green!=s.green) return false;
+        if (blue!=s.blue) return false;
+        return true;
     }
 
-    /* Uncomment this method after you've written
-       equals and failed the testHashCodeAndEqualsConsistency
-       test.
+
     @Override
     public int hashCode() {
         if (!USE_PERFECT_HASH) {
             return red + green + blue;
         } else {
             // TODO: Write a perfect hash function for Simple Oomages.
-            return 0;
+            return perfect();
         }
-    }*/
+    }
+
+    private int perfect() {
+        int[] rgb = new int[3];
+        rgb[0] = red / 5;
+        rgb[1] = green / 5;
+        rgb[2] = blue / 5;
+        int perfectcode = 0;
+        for (int i = 0; i < 3; i++) {
+            perfectcode = perfectcode * 53;
+            perfectcode += rgb[i];
+        }
+        return perfectcode;
+    }
+
 
     public SimpleOomage(int r, int g, int b) {
         if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {

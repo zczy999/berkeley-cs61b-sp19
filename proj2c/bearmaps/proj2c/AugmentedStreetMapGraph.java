@@ -2,7 +2,10 @@ package bearmaps.proj2c;
 
 import bearmaps.hw4.streetmap.Node;
 import bearmaps.hw4.streetmap.StreetMapGraph;
+import bearmaps.proj2ab.KDTree;
+import bearmaps.proj2ab.MyTrieSet;
 import bearmaps.proj2ab.Point;
+import bearmaps.proj2ab.TrieSet61B;
 
 import java.util.*;
 
@@ -15,10 +18,26 @@ import java.util.*;
  */
 public class AugmentedStreetMapGraph extends StreetMapGraph {
 
+    Map<Point,Node> nodeMap;
+    KDTree kdTree;
+    TrieSet61B tries;
+
     public AugmentedStreetMapGraph(String dbPath) {
         super(dbPath);
         // You might find it helpful to uncomment the line below:
-        // List<Node> nodes = this.getNodes();
+         List<Node> nodes = this.getNodes();
+         List<Point> Apoints = new ArrayList<>();
+         tries = new MyTrieSet();
+         nodeMap = new HashMap<>();
+        for (Node k: nodes) {
+            Point point = new Point(k.lat(),k.lon());
+            Apoints.add(point);
+            nodeMap.put(point,k);
+            if (k.name() != null) {
+                tries.add(cleanString(k.name()));
+            }
+        }
+        kdTree = new KDTree(Apoints);
     }
 
 
@@ -30,7 +49,9 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * @return The id of the node in the graph closest to the target.
      */
     public long closest(double lon, double lat) {
-        return 0;
+        Point closestP = kdTree.nearest(lat, lon);
+        Node node = nodeMap.get(closestP);
+        return node.id();
     }
 
 
@@ -43,7 +64,7 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * cleaned <code>prefix</code>.
      */
     public List<String> getLocationsByPrefix(String prefix) {
-        return new LinkedList<>();
+        return tries.keysWithPrefix(prefix);
     }
 
     /**

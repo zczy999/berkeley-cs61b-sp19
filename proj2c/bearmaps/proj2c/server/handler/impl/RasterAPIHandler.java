@@ -84,12 +84,94 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      */
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        //System.out.println("yo, wanna know the parameters given by the web browser? They are:");
-        //System.out.println(requestParams);
+        System.out.println("yo, wanna know the parameters given by the web browser? They are:");
+        System.out.println(requestParams);
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented RasterAPIHandler.processRequest, nothing is displayed in "
-                + "your browser.");
+//        System.out.println("Since you haven't implemented RasterAPIHandler.processRequest, nothing is displayed in "
+//                + "your browser.");
+        /*
+        1.判断图片等级
+        2.找到相关等级的图片
+         */
+//        Constants.ROOT_LRLAT;
+        double lrlon = requestParams.get("lrlon");
+        double ullon = requestParams.get("ullon");
+        double lrlat = requestParams.get("lrlat");
+        double ullat = requestParams.get("ullat");
+        double w = requestParams.get("w");
+        int depth = getDepth(lrlon, ullon, w);
+        double difLon = Constants.ROOT_LRLON - Constants.ROOT_ULLON;
+        double difLat = Constants.ROOT_ULLAT - Constants.ROOT_LRLAT;
+        double difRaster_difLon = difLon/Math.pow(2,depth);
+        double difRaster_difLat = difLat/Math.pow(2,depth);
+        int sLon = -1;
+        double root_ullon = Constants.ROOT_ULLON;
+        while (ullon>=root_ullon) {
+            root_ullon += difRaster_difLon;
+            sLon++;
+        }
+        if (sLon<0) sLon=0;
+        double raster_ul_lon = Constants.ROOT_ULLON+sLon*difRaster_difLon;
+        int eLon = -1;
+        root_ullon = Constants.ROOT_ULLON;
+        while (lrlon>=root_ullon) {
+            root_ullon += difRaster_difLon;
+            eLon++;
+        }
+        if (eLon>=Math.pow(2,depth)) eLon=(int) Math.pow(2,depth)-1;
+        double raster_lr_lon = Constants.ROOT_ULLON+(eLon+1)*difRaster_difLon;
+        int sLat = -1;
+        double root_ullat = Constants.ROOT_ULLAT;
+        while (ullat<=root_ullat) {
+            root_ullat -= difRaster_difLat;
+            sLat++;
+        }
+        if (sLat<0) sLat=0;
+        double raster_ul_lat = Constants.ROOT_ULLAT-sLat*difRaster_difLat;
+        int eLat = -1;
+        root_ullat = Constants.ROOT_ULLAT;
+        while (lrlat<=root_ullat) {
+            root_ullat -= difRaster_difLat;
+            eLat++;
+        }
+        if (eLat>=Math.pow(2,depth)) eLat=(int) Math.pow(2,depth)-1;
+        double raster_lr_lat = Constants.ROOT_ULLAT-(eLat+1)*difRaster_difLat;
+        String[][] render_grid = new String[eLat-sLat+1][eLon-sLon+1];
+        int nsLon = sLon;
+        int nsLat = sLat;
+        for (int i = 0; i < eLat-sLat+1; i++) {
+            for (int j = 0; j < eLon-sLon+1; j++) {
+                render_grid[i][j] = "d"+depth+"_x"+nsLon+"_y"+nsLat+".png";
+                nsLon++;
+            }
+            nsLon = sLon;
+            nsLat++;
+        }
+
+        results.put("query_success",true);
+        results.put("raster_ul_lon",raster_ul_lon);
+        results.put("raster_ul_lat",raster_ul_lat);
+        results.put("raster_lr_lon",raster_lr_lon);
+        results.put("raster_lr_lat",raster_lr_lat);
+        results.put("depth",depth);
+        results.put("render_grid",render_grid);
+        System.out.println(results);
         return results;
+    }
+
+
+    private int getDepth(double lrlon, double ullon, double w) {
+        double lonDPP = (lrlon-ullon)/w;
+        double rootLonDPP = Constants.ROOT_LONDPP;
+        int depth = 0;
+        while (lonDPP<rootLonDPP){
+            rootLonDPP = rootLonDPP/2;
+            depth++;
+            if (depth == 7) {
+                break;
+            }
+        }
+        return depth;
     }
 
     @Override
